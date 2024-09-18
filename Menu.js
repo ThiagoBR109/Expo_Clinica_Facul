@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const Menu = ({ navigation }) => {
     return(
-        // Um único elemento pai que envolve todo o conteúdo
         <View style={styles.container}>
             <View style={styles.contentContainer}>
                 
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
         padding: 20,  
     },
     contentContainer: {
-        flex: 1,  // O conteúdo principal (título e botões) ocupa o espaço disponível
+        flex: 1,
         justifyContent: 'center', 
         alignItems: 'center',  
     },
