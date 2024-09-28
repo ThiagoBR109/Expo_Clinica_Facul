@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 const Menu = ({ navigation }) => {
     return(
@@ -7,19 +8,23 @@ const Menu = ({ navigation }) => {
             <View style={styles.contentContainer}>
                 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={styles.button} 
-                        onPress={() => navigation.navigate('Login')}
-                    >
-                        <Text style={styles.buttonText}>Acesso de Pacientes</Text>
-                    </TouchableOpacity>
+                    <Animatable.View animation="fadeInRight" duration={2500}>
+                        <TouchableOpacity 
+                            style={styles.button} 
+                            onPress={() => navigation.navigate('Login')}
+                        >
+                            <Text style={styles.buttonText}>Acesso de Pacientes</Text>
+                        </TouchableOpacity>
+                    </Animatable.View>
 
+                    <Animatable.View animation="fadeInLeft" duration={2500}>
                     <TouchableOpacity 
                         style={styles.button} 
-                        onPress={() => navigation.navigate('Login')}
+                        onPress={() => navigation.navigate('Login_adm')}
                     >
                         <Text style={styles.buttonText}>Acesso de Administrador</Text>
                     </TouchableOpacity>
+                    </Animatable.View>
                 </View>
             </View>
 

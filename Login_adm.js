@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
 
-const Login = ({ navigation }) => {
+const Login_adm = ({ navigation }) => {
     const [usuario, setUsuario] = useState('');
     const [senha, setSenha] = useState('');
 
     const handleLogin = () => {
         if (usuario === 'Thiago' && senha === '123') {
             alert("Login Efetuado!");
-            navigation.navigate('Exame'); 
+            navigation.navigate('Cadastro'); 
             setUsuario('');  
             setSenha('');  
         } else {
@@ -27,11 +27,11 @@ const Login = ({ navigation }) => {
                 <Text style={styles.header}>Saúde Fácil</Text>
             </View>
         
-            <Text style={styles.subtitle}>Resultado de Exames</Text>
+            <Text style={styles.subtitle}>Área do Administrador</Text>
         
             <View style={styles.inputContainer}>
                 <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Usuário</Text>
+                    <Text style={styles.label}>Usuário do Administrador</Text>
                     <TextInput
                         style={styles.input}
                         value={usuario}
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
 
 
 
-export default Login;
+export default Login_adm;

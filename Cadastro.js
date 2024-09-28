@@ -5,6 +5,7 @@ const Cadastro = () => {
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [cpf, setCpf] = useState('');
+    const [idade, setIdade] = useState('');
     const [celular, setCelular] = useState('');
     const [cep, setCep] = useState('');
     const [sus, setSus] = useState('');
@@ -14,6 +15,7 @@ const Cadastro = () => {
         console.log('Nome:', nome);
         console.log('Email:', email);
         console.log('CPF:', cpf);
+        console.log('Idade:', idade);
         console.log('Celular:', celular);
         console.log('CEP:', cep);
         console.log('Sus:', sus);
@@ -46,6 +48,15 @@ return (
             onChangeText={setCpf}
             keyboardType="numeric"
             maxLength={11}
+        />
+
+        <TextInput
+            style={styles.input}
+            placeholder="Idade"
+            value={idade}
+            onChangeText={setIdade}
+            keyboardType="numeric"
+            maxLength={3}
         />
 
         <TextInput
