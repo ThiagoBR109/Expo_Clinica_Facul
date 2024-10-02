@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const Login = ({ navigation }) => {
     const [usuario, setUsuario] = useState('');
@@ -52,7 +52,9 @@ const Login = ({ navigation }) => {
             </View>
         
             <View style={styles.buttonContainer}>
-                <Button title="Login" onPress={handleLogin} />
+                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                    <Text style={styles.buttonText}>LOGIN</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -119,6 +121,20 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginTop: 20,
         width: '60%',
+    },
+    button: {
+        backgroundColor: '#1E90FF',
+        paddingVertical: 15,
+        paddingHorizontal: 50,
+        borderRadius: 25,
+        marginBottom: 20,
+        width: '100%',
+        alignItems: 'center',  
+    },
+    buttonText:{
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

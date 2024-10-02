@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 const Cadastro = () => {
     const [nome, setNome] = useState('');
@@ -10,6 +10,7 @@ const Cadastro = () => {
     const [cep, setCep] = useState('');
     const [sus, setSus] = useState('');
     const [senha, setSenha] = useState('');
+    const [genero, setGenero] = useState('');
 
     const handleCadastro = () => {
         console.log('Nome:', nome);
@@ -20,11 +21,12 @@ const Cadastro = () => {
         console.log('CEP:', cep);
         console.log('Sus:', sus);
         console.log('Senha:', senha);
+        console.log('Gênero:', genero);
     };
 
 return (
     <View style={styles.container}>
-        <Text style={styles.title}>Tela de Cadastro</Text>
+        <Text style={styles.title}>Cadastro do Paciente</Text>
 
         <TextInput
             style={styles.input}
@@ -94,7 +96,30 @@ return (
             secureTextEntry={true}
         />
 
-        <Button title="Cadastrar" onPress={handleCadastro} />
+        <Text style={styles.label}>Gênero</Text>
+            <View style={styles.radioContainer}>
+                <TouchableOpacity 
+                    style={styles.radioButton} 
+                    onPress={() => setGenero('Masculino')}
+                >
+                    <View style={genero === 'Masculino' ? styles.radioButtonSelected : styles.radioButtonUnselected} />
+                    <Text style={styles.radioText}>Masculino</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                    style={styles.radioButton} 
+                    onPress={() => setGenero('Feminino')}
+                >
+                    <View style={genero === 'Feminino' ? styles.radioButtonSelected : styles.radioButtonUnselected} />
+                    <Text style={styles.radioText}>Feminino</Text>
+                </TouchableOpacity>
+            </View>
+
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+                <Text style={styles.buttonText}>CADASTRAR</Text>
+            </TouchableOpacity>
+        </View>
     </View>
     );
 };
@@ -123,7 +148,60 @@ input: {
     backgroundColor: 'white',
     paddingHorizontal: 15,
     
-}
+},
+label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+},
+radioContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 15,
+},
+radioButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 10,
+},
+radioButtonUnselected: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    marginRight: 10,
+},
+radioButtonSelected: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#f56f42',
+    backgroundColor: '#f56f42',
+    marginRight: 10,
+},
+radioText: {
+    fontSize: 16,
+},
+buttonContainer: {
+    marginTop: 20,
+    width: '60%',
+},
+button: {
+    backgroundColor: '#f56f42',
+    paddingVertical: 15,
+    paddingHorizontal: 50,
+    borderRadius: 25,
+    marginBottom: 20,
+    width: '100%',
+    alignItems: 'center',  
+},
+buttonText:{
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+},
 });
 
 export default Cadastro;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
 
 const Login_adm = ({ navigation }) => {
     const [usuario, setUsuario] = useState('');
@@ -8,7 +8,7 @@ const Login_adm = ({ navigation }) => {
     const handleLogin = () => {
         if (usuario === 'Thiago' && senha === '123') {
             alert("Login Efetuado!");
-            navigation.navigate('Cadastro'); 
+            navigation.navigate('Menu_adm'); 
             setUsuario('');  
             setSenha('');  
         } else {
@@ -52,7 +52,9 @@ const Login_adm = ({ navigation }) => {
             </View>
         
             <View style={styles.buttonContainer}>
-                <Button title="Login" onPress={handleLogin} />
+                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                    <Text style={styles.buttonText}>LOGIN</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -114,11 +116,25 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         borderColor: '#ccc',
-        backgroundColor: 'white',
+        backgroundColor: 'white', 
     },
     buttonContainer: {
         marginTop: 20,
         width: '60%',
+    },
+    button: {
+        backgroundColor: '#f56f42',
+        paddingVertical: 15,
+        paddingHorizontal: 50,
+        borderRadius: 25,
+        marginBottom: 20,
+        width: '100%',
+        alignItems: 'center',  
+    },
+    buttonText:{
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

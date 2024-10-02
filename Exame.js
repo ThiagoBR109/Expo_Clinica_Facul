@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const examList = [
     { id: '1', name: 'Exame de Sangue', date: '2024-09-20' },
@@ -9,13 +10,14 @@ const examList = [
 ];
 
 const Exame = () => {
+    const navigation = useNavigation();
 const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-        <View styles={styles.textContainer}>
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ExamDetails', { examId: item.id })}>
+        <View style={styles.textContainer}>
             <Text style={styles.examName}>{item.name}</Text>
             <Text style={styles.examDate}>Data: {item.date}</Text>
         </View>
-        <Icon name="chevron-right" size={24} color="#888" />
+        <Icon name="chevron-right" size={24} color="#1E90FF" />
     </TouchableOpacity>
 );
 
