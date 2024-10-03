@@ -11,11 +11,17 @@ const examList = [
 
 const Exame = () => {
     const navigation = useNavigation();
+
+const formatDate = (dateString) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`; 
+};
+
 const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ExamDetails', { examId: item.id })}>
         <View style={styles.textContainer}>
             <Text style={styles.examName}>{item.name}</Text>
-            <Text style={styles.examDate}>Data: {item.date}</Text>
+            <Text style={styles.examDate}>Data: {formatDate(item.date)}</Text>
         </View>
         <Icon name="chevron-right" size={24} color="#1E90FF" />
     </TouchableOpacity>
