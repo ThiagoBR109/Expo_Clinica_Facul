@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
 const Cadastro = () => {
     const [nome, setNome] = useState('');
@@ -12,91 +12,132 @@ const Cadastro = () => {
     const [senha, setSenha] = useState('');
     const [genero, setGenero] = useState('');
 
+    // Função para enviar os dados para o backend
     const handleCadastro = () => {
-        console.log('Nome:', nome);
-        console.log('Email:', email);
-        console.log('CPF:', cpf);
-        console.log('Idade:', idade);
-        console.log('Celular:', celular);
-        console.log('CEP:', cep);
-        console.log('Sus:', sus);
-        console.log('Senha:', senha);
-        console.log('Gênero:', genero);
+        // Validação básica dos campos antes de enviar
+        if (!nome || !email || !cpf || !idade || !celular || !cep || !sus || !senha || !genero) {
+            Alert.alert('Erro', 'Todos os campos devem ser preenchidos.');
+            return;
+        }
+
+        // Dados a serem enviados para o backend
+        const pacienteData = {
+            nome,
+            email,
+            cpf,
+            idade,
+            celular,
+            cep,
+            sus,
+            senha,
+            genero
+        };
+
+        // Fazendo a requisição POST para a API
+        fetch('http://172.16.1.110:3001/pacientes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(pacienteData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Paciente cadastrado com sucesso!') {
+                Alert.alert('Sucesso', 'Paciente cadastrado com sucesso!');
+                // Limpar os campos após o cadastro
+                setNome('');
+                setEmail('');
+                setCpf('');
+                setIdade('');
+                setCelular('');
+                setCep('');
+                setSus('');
+                setSenha('');
+                setGenero('');
+            } else {
+                Alert.alert('Erro', 'Ocorreu um erro ao cadastrar o paciente.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao cadastrar paciente:', error);
+            Alert.alert('Erro', 'Erro ao conectar com o servidor.');
+        });
     };
 
-return (
-    <View style={styles.container}>
-        <Text style={styles.title}>Cadastro do Paciente</Text>
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Cadastro do Paciente</Text>
 
-        <TextInput
-            style={styles.input}
-            placeholder="Nome Completo"
-            value={nome}
-            onChangeText={setNome}
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="Nome Completo"
+                value={nome}
+                onChangeText={setNome}
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="CPF"
-            value={cpf}
-            onChangeText={setCpf}
-            keyboardType="numeric"
-            maxLength={11}
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="CPF"
+                value={cpf}
+                onChangeText={setCpf}
+                keyboardType="numeric"
+                maxLength={11}
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="Idade"
-            value={idade}
-            onChangeText={setIdade}
-            keyboardType="numeric"
-            maxLength={3}
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="Idade"
+                value={idade}
+                onChangeText={setIdade}
+                keyboardType="numeric"
+                maxLength={3}
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="Celular"
-            value={celular}
-            onChangeText={setCelular}
-            keyboardType="phone-pad"
-            maxLength={11}
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="Celular"
+                value={celular}
+                onChangeText={setCelular}
+                keyboardType="phone-pad"
+                maxLength={11}
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="CEP"
-            value={cep}
-            onChangeText={setCep}
-            keyboardType="numeric"
-            maxLength={8}
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="CEP"
+                value={cep}
+                onChangeText={setCep}
+                keyboardType="numeric"
+                maxLength={8}
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="Cartão SUS"
-            value={sus}
-            onChangeText={setSus}
-            keyboardType="numeric"  
-            maxLength={15}  
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="Cartão SUS"
+                value={sus}
+                onChangeText={setSus}
+                keyboardType="numeric"  
+                maxLength={15}  
+            />
 
-        <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry={true}
-        />
+            <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                value={senha}
+                onChangeText={setSenha}
+                secureTextEntry={true}
+            />
 
-        <Text style={styles.label}>Gênero</Text>
+            <Text style={styles.label}>Gênero</Text>
             <View style={styles.radioContainer}>
                 <TouchableOpacity 
                     style={styles.radioButton} 
@@ -105,7 +146,7 @@ return (
                     <View style={genero === 'Masculino' ? styles.radioButtonSelected : styles.radioButtonUnselected} />
                     <Text style={styles.radioText}>Masculino</Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity 
                     style={styles.radioButton} 
                     onPress={() => setGenero('Feminino')}
@@ -115,12 +156,12 @@ return (
                 </TouchableOpacity>
             </View>
 
-        <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-                <Text style={styles.buttonText}>CADASTRAR</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+                    <Text style={styles.buttonText}>CADASTRAR</Text>
+                </TouchableOpacity>
+            </View>
         </View>
-    </View>
     );
 };
 

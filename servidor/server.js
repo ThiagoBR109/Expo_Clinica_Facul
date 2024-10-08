@@ -38,7 +38,7 @@ app.post('/pacientes', (req, res) => {
     }
 
     // Query para inserir o paciente no banco de dados
-    const query = 'INSERT INTO pacientes (nome, email, cpf, idade, celular, cep, sus, senha, genero) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const query = 'INSERT INTO pacientes (paciente_nome, paciente_email, paciente_cpf, paciente_idade, paciente_celular, paciente_cep, paciente_sus, paciente_senha, paciente_genero) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
     db.query(query, [nome, email, cpf, idade, celular, cep, sus, senha, genero], (err, result) => {
         if (err) {
             console.error('Erro ao inserir paciente no banco de dados:', err);
@@ -61,6 +61,7 @@ app.get('/pacientes', (req, res) => {
 });
 
 const PORT = 3001;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor rodando na porta ${PORT} e acessível pela rede local`);
 });
+
