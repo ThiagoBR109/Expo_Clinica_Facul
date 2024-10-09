@@ -8,6 +8,8 @@ import Menu from './Menu';
 import Exame from './Exame';
 import ExamDetails from './ExamDetails';
 import Menu_adm from './Menu_adm';
+import PacientesList from './PacientesList';
+import PacienteDetails from './PacienteDetails'; 
 
 const Stack = createStackNavigator();
 
@@ -33,6 +35,8 @@ const App = () => {
         <Stack.Screen name="Exame" component={Exame} />
         <Stack.Screen name="ExamDetails" component={ExamDetails} options={{title: ''}}/>
         <Stack.Screen name="Menu_adm" component={Menu_adm} options={{title: 'Menu', headerStyle:{backgroundColor: '#f56f42'}}}/>
+        <Stack.Screen name="PacientesList" component={PacientesList} options={{title: 'Pacientes', headerStyle:{backgroundColor: '#f56f42'}}}/>
+        <Stack.Screen name="PacienteDetails" component={PacienteDetails} options={{title: 'Pacientes', headerStyle:{backgroundColor: '#f56f42'}}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

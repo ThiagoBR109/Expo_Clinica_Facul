@@ -20,9 +20,9 @@ const Menu_adm = ({ navigation }) => {
                     <Animatable.View animation="fadeInLeft" duration={2500}>
                     <TouchableOpacity 
                         style={styles.button} 
-                        onPress={() => navigation.navigate('')}
+                        onPress={() => navigation.navigate('PacientesList')}
                     >
-                        <Text style={styles.buttonText}>Envio de Exame</Text>
+                        <Text style={styles.buttonText}>Envio de Exame/ Editar Pacientes</Text>
                     </TouchableOpacity>
                     </Animatable.View>
                 </View>
