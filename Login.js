@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Modal } from 'react-native';
 
 const Login = ({ navigation }) => {
     const [usuario, setUsuario] = useState('');
     const [senha, setSenha] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     const handleLogin = () => {
         if (usuario === 'Thiago' && senha === '123') {
-            alert("Login Efetuado!");
-            navigation.navigate('Exame'); 
-            setUsuario('');  
-            setSenha('');  
+            setModalMessage('Login Efetuado!');
+            setModalVisible(true);
+            setTimeout(() => {
+                setModalVisible(false);
+                navigation.navigate('Exame'); 
+                setUsuario('');
+                setSenha('');
+            }, 1000); // Fecha o modal e navega após 2 segundos
         } else {
-            alert('Usuário ou senha inválidos!');
+            setModalMessage('Usuário ou senha inválidos!');
+            setModalVisible(true);
+            setTimeout(() => setModalVisible(false), 2000); // Fecha o modal após 2 segundos
         }
     };
 
@@ -56,10 +64,22 @@ const Login = ({ navigation }) => {
                     <Text style={styles.buttonText}>LOGIN</Text>
                 </TouchableOpacity>
             </View>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>{modalMessage}</Text>
+                    </View>
+                </View>
+            </Modal>
+
         </View>
     );
-    
-    
 };
 
 const styles = StyleSheet.create({
@@ -135,6 +155,25 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalView: {
+        width: 300,
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+        elevation: 5,
+    },
+    modalText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 

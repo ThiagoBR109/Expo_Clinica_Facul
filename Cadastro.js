@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 
 const Cadastro = () => {
     const [nome, setNome] = useState('');
@@ -11,12 +11,14 @@ const Cadastro = () => {
     const [sus, setSus] = useState('');
     const [senha, setSenha] = useState('');
     const [genero, setGenero] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     // Função para enviar os dados para o backend
     const handleCadastro = () => {
         // Validação básica dos campos antes de enviar
         if (!nome || !email || !cpf || !idade || !celular || !cep || !sus || !senha || !genero) {
-            Alert.alert('Erro', 'Todos os campos devem ser preenchidos.');
+            showModal('Erro: Todos os campos devem ser preenchidos.');
             return;
         }
 
@@ -44,7 +46,7 @@ const Cadastro = () => {
         .then(response => response.json())
         .then(data => {
             if (data.message === 'Paciente cadastrado com sucesso!') {
-                Alert.alert('Sucesso', 'Paciente cadastrado com sucesso!');
+                showModal('Paciente cadastrado com sucesso!');
                 // Limpar os campos após o cadastro
                 setNome('');
                 setEmail('');
@@ -56,13 +58,21 @@ const Cadastro = () => {
                 setSenha('');
                 setGenero('');
             } else {
-                Alert.alert('Erro', 'Ocorreu um erro ao cadastrar o paciente.');
+                showModal('Erro: Ocorreu um erro ao cadastrar o paciente.');
             }
         })
         .catch(error => {
             console.error('Erro ao cadastrar paciente:', error);
-            Alert.alert('Erro', 'Erro ao conectar com o servidor.');
+            showModal('Erro: Erro ao conectar com o servidor.');
         });
+    };
+
+    const showModal = (message) => {
+        setModalMessage(message);
+        setModalVisible(true);
+        setTimeout(() => {
+            setModalVisible(false);  // Fecha o modal automaticamente após 2 segundos
+        }, 2000);
     };
 
     return (
@@ -125,8 +135,8 @@ const Cadastro = () => {
                 placeholder="Cartão SUS"
                 value={sus}
                 onChangeText={setSus}
-                keyboardType="numeric"  
-                maxLength={15}  
+                keyboardType="numeric"
+                maxLength={15}
             />
 
             <TextInput
@@ -161,88 +171,115 @@ const Cadastro = () => {
                     <Text style={styles.buttonText}>CADASTRAR</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Modal de notificação */}
+            <Modal
+                transparent={true}
+                animationType="fade"
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalMessage}>{modalMessage}</Text>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#d3f2f0',
-    padding: 20,
-    
-},
-title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-},
-input: {
-    width: '75%',
-    height: 40,
-    bordercolor: 'gray',
-    borderwidth: 1,
-    borderRadius: 15,
-    marginBottom: 15,
-    backgroundColor: 'white',
-    paddingHorizontal: 15,
-    
-},
-label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-},
-radioContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 15,
-},
-radioButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 10,
-},
-radioButtonUnselected: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#ccc',
-    marginRight: 10,
-},
-radioButtonSelected: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#f56f42',
-    backgroundColor: '#f56f42',
-    marginRight: 10,
-},
-radioText: {
-    fontSize: 16,
-},
-buttonContainer: {
-    marginTop: 20,
-    width: '60%',
-},
-button: {
-    backgroundColor: '#f56f42',
-    paddingVertical: 15,
-    paddingHorizontal: 50,
-    borderRadius: 25,
-    marginBottom: 20,
-    width: '100%',
-    alignItems: 'center',  
-},
-buttonText:{
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-},
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#d3f2f0',
+        padding: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    input: {
+        width: '75%',
+        height: 40,
+        bordercolor: 'gray',
+        borderwidth: 1,
+        borderRadius: 15,
+        marginBottom: 15,
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    radioContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 15,
+    },
+    radioButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 10,
+    },
+    radioButtonUnselected: {
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#ccc',
+        marginRight: 10,
+    },
+    radioButtonSelected: {
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#f56f42',
+        backgroundColor: '#f56f42',
+        marginRight: 10,
+    },
+    radioText: {
+        fontSize: 16,
+    },
+    buttonContainer: {
+        marginTop: 20,
+        width: '60%',
+    },
+    button: {
+        backgroundColor: '#f56f42',
+        paddingVertical: 15,
+        paddingHorizontal: 50,
+        borderRadius: 25,
+        marginBottom: 20,
+        width: '100%',
+        alignItems: 'center',  
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+    },
+    modalMessage: {
+        fontSize: 16,
+        color: '#333',
+    },
 });
 
 export default Cadastro;

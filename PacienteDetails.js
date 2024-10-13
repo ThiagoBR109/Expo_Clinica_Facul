@@ -118,6 +118,7 @@ const PacienteDetails = ({ route }) => {
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Editar Paciente</Text>
 
+                        <Text>Nome</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Nome"
@@ -125,6 +126,7 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setNome}
                         />
 
+                        <Text>Email</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Email"
@@ -132,6 +134,7 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setEmail}
                         />
 
+                        <Text>CPF</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="CPF"
@@ -139,6 +142,7 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setCpf}
                         />
 
+                        <Text>Idade</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Idade"
@@ -146,6 +150,7 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setIdade}
                         />
 
+                        <Text>Celular</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Celular"
@@ -153,6 +158,7 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setCelular}
                         />
 
+                        <Text>CEP</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="CEP"
@@ -160,13 +166,15 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setCep}
                         />
 
+                        <Text>Carteira SUS</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="SUS"
                             value={sus}
                             onChangeText={setSus}
                         />
-
+                        
+                        <Text>Senha</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Senha"
@@ -174,6 +182,7 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setSenha}
                         />
 
+                        <Text>Genero</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Gênero"
@@ -181,8 +190,14 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setGenero}
                         />
 
-                        <Button title="Salvar" onPress={handleSalvarEdicao} />
-                        <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
+                        
+                        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleEditarPaciente}>
+                            <Text style={[styles.buttonText, styles.buttonText2]}>Salvar</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={() => setModalVisible(false)}>
+                            <Text style={styles.buttonTextDelete}>Cancelar</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -254,6 +269,14 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         paddingLeft: 8,
         borderRadius: 5,
+    },
+    saveButton: {
+        backgroundColor: '#1E90FF', // Escolha uma cor para o botão "Salvar"
+    },
+    buttonText2: {
+        fontSize: 16,
+        color: '#ffffff',
+        marginLeft: 10,
     },
 });
 
