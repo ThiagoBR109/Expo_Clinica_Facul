@@ -10,6 +10,7 @@ const app = express();
 // Configurando middlewares
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); // Middleware adicionado para permitir requisições URL-encoded
 
 // Configurando a conexão com o banco de dados MySQL
 const db = mysql.createConnection({
@@ -56,12 +57,81 @@ app.get('/pacientes', (req, res) => {
             console.error('Erro ao buscar pacientes:', err);
             return res.status(500).json({ message: 'Erro ao buscar pacientes.' });
         }
+        res.setHeader('Content-Type', 'application/json');  // Garantindo que a resposta seja JSON
         res.json(results);
     });
 });
 
+// Rota para atualizar os dados de um paciente (PUT)
+app.put('/pacientes/:id', (req, res) => {
+    const pacienteId = req.params.id;
+    const { nome, email, cpf, idade, celular, cep, sus, senha, genero } = req.body;
+
+    // Verificação básica para garantir que todos os campos estão preenchidos
+    if (!nome || !email || !cpf || !idade || !celular || !cep || !sus || !senha || !genero) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+    }
+
+    // Query para atualizar os dados do paciente no banco de dados
+    const query = 'UPDATE pacientes SET paciente_nome = ?, paciente_email = ?, paciente_cpf = ?, paciente_idade = ?, paciente_celular = ?, paciente_cep = ?, paciente_sus = ?, paciente_senha = ?, paciente_genero = ? WHERE paciente_id = ?';
+    db.query(query, [nome, email, cpf, idade, celular, cep, sus, senha, genero, pacienteId], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar paciente no banco de dados:', err);
+            return res.status(500).json({ message: 'Erro ao atualizar paciente.' });
+        }
+
+        // Verificando se o paciente foi atualizado com sucesso
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Paciente não encontrado.' });
+        }
+
+        res.setHeader('Content-Type', 'application/json');  // Garantindo que a resposta seja JSON
+        res.json({ message: 'Paciente atualizado com sucesso!' });
+    });
+});
+
+app.delete('/pacientes/:id', (req, res) => {
+    const pacienteId = req.params.id;
+
+    const query = 'DELETE FROM pacientes WHERE paciente_id = ?';
+    db.query(query, [pacienteId], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar paciente:', err);
+            return res.status(500).json({ message: 'Erro ao deletar paciente.' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Paciente não encontrado.' });
+        }
+
+        res.json({ message: 'Paciente deletado com sucesso!' });
+    });
+});
+
+// Função para reconectar ao MySQL em caso de perda de conexão
+function handleDisconnect() {
+    db.connect((err) => {
+        if (err) {
+            console.error('Erro ao reconectar ao banco de dados:', err);
+            setTimeout(handleDisconnect, 2000); // Tentar reconectar após 2 segundos
+        } else {
+            console.log('Reconectado ao banco de dados MySQL.');
+        }
+    });
+}
+
+// Detectando desconexão do MySQL e tentando reconectar
+db.on('error', (err) => {
+    console.error('Erro no banco de dados:', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+        handleDisconnect();
+    } else {
+        throw err;
+    }
+});
+
+// Iniciando o servidor
 const PORT = 3001;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor rodando na porta ${PORT} e acessível pela rede local`);
 });
-

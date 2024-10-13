@@ -22,7 +22,7 @@ const Menu_adm = ({ navigation }) => {
                         style={styles.button} 
                         onPress={() => navigation.navigate('PacientesList')}
                     >
-                        <Text style={styles.buttonText}>Envio de Exame/ Editar Pacientes</Text>
+                        <Text style={styles.buttonText}>Lista de Pacientes</Text>
                     </TouchableOpacity>
                     </Animatable.View>
                 </View>
