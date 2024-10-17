@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, TextInput, Button } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';  // Importando os ícones
+import * as DocumentPicker from "expo-document-picker";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const PacienteDetails = ({ route }) => {
+const PacienteDetails = ({ route, navigation }) => {
     const { paciente } = route.params;
     const [modalVisible, setModalVisible] = useState(false);
     const [nome, setNome] = useState(paciente.paciente_nome);
@@ -14,9 +15,40 @@ const PacienteDetails = ({ route }) => {
     const [sus, setSus] = useState(paciente.paciente_sus);
     const [senha, setSenha] = useState(paciente.paciente_senha);
     const [genero, setGenero] = useState(paciente.paciente_genero);
+    const [selectedFile, setSelectedFile] = useState(null);
 
-    const handleEnviarPDF = () => {
-        Alert.alert('Envio de PDF', `Enviar PDF para ${paciente.paciente_nome}`);
+    // Atualiza os campos do paciente na tela quando o paciente é modificado
+    useEffect(() => {
+        setNome(paciente.paciente_nome);
+        setEmail(paciente.paciente_email);
+        setCpf(paciente.paciente_cpf);
+        setIdade(paciente.paciente_idade);
+        setCelular(paciente.paciente_celular);
+        setCep(paciente.paciente_cep);
+        setSus(paciente.paciente_sus);
+        setSenha(paciente.paciente_senha);
+        setGenero(paciente.paciente_genero);
+    }, [paciente]);
+
+    const handleEnviarPDF = async () => {
+        try {
+            let result = await DocumentPicker.getDocumentAsync({
+                type: "application/pdf",
+                copyToCacheDirectory: true,
+            });
+    
+            console.log(result);  // Verificar o resultado do seletor de PDF
+    
+            if (!result.canceled) {  // Corrigido: Verificar se o cancelamento é "false"
+                setSelectedFile(result.uri);  // Atualizar o estado com o URI do arquivo
+                Alert.alert('PDF Selecionado', `Arquivo: ${result.assets[0].name}`);  // Exibir o nome do arquivo selecionado
+            } else {
+                Alert.alert('Seleção Cancelada', 'Você não selecionou nenhum arquivo.');
+            }
+        } catch (error) {
+            console.error('Erro ao selecionar PDF:', error);
+            Alert.alert('Erro', 'Não foi possível selecionar o PDF.');
+        }
     };
 
     const handleEditarPaciente = () => {
@@ -89,13 +121,15 @@ const PacienteDetails = ({ route }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Detalhes do Paciente</Text>
-            <Text style={styles.label}>Nome: {paciente.paciente_nome}</Text>
-            <Text style={styles.label}>Email: {paciente.paciente_email}</Text>
+            <Text style={styles.label}>Nome: {nome}</Text>
+            <Text style={styles.label}>Email: {email}</Text>
 
             <TouchableOpacity style={styles.button} onPress={handleEnviarPDF}>
                 <Icon name="upload" size={20} color="#1E90FF" style={styles.icon} />
                 <Text style={styles.buttonText}>Enviar PDF</Text>
             </TouchableOpacity>
+
+            {selectedFile && <Text>PDF Selecionado: {selectedFile}</Text>}
 
             <TouchableOpacity style={styles.button} onPress={handleEditarPaciente}>
                 <Icon name="edit" size={20} color="#1E90FF" style={styles.icon} />
@@ -190,14 +224,10 @@ const PacienteDetails = ({ route }) => {
                             onChangeText={setGenero}
                         />
 
+                        <Button title="Salvar" onPress={handleSalvarEdicao} />
+                            <Text> </Text>
+                        <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
                         
-                        <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleEditarPaciente}>
-                            <Text style={[styles.buttonText, styles.buttonText2]}>Salvar</Text>
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={() => setModalVisible(false)}>
-                            <Text style={styles.buttonTextDelete}>Cancelar</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -269,14 +299,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         paddingLeft: 8,
         borderRadius: 5,
-    },
-    saveButton: {
-        backgroundColor: '#1E90FF', // Escolha uma cor para o botão "Salvar"
-    },
-    buttonText2: {
-        fontSize: 16,
-        color: '#ffffff',
-        marginLeft: 10,
     },
 });
 
