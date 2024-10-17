@@ -19,8 +19,12 @@ const PacientesList = ({ navigation }) => {
     };
 
     useEffect(() => {
-        fetchPacientes();  // Busca os pacientes quando a tela for carregada
-    }, []);
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchPacientes();  // Busca os pacientes quando a tela voltar a ser focada
+        });
+
+        return unsubscribe;  // Remove o listener quando o componente desmontar
+    }, [navigation]);
 
     const renderPaciente = ({ item }) => (
         <TouchableOpacity 
