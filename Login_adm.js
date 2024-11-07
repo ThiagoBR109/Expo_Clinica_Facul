@@ -8,7 +8,7 @@ const Login_adm = ({ navigation }) => {
     const [modalMessage, setModalMessage] = useState('');
 
     const handleLogin = () => {
-        if (usuario === 'Thiago' && senha === '123') {
+        if (usuario === 'Adm' && senha === 'Qwe') {
             setModalMessage('Login Efetuado!');
             setModalVisible(true);
             setTimeout(() => {

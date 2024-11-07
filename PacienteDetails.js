@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Modal, TextInput, Button } from 'react-native';
-import * as DocumentPicker from "expo-document-picker";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const PacienteDetails = ({ route, navigation }) => {
     const { paciente } = route.params;
     const [modalVisible, setModalVisible] = useState(false);
+    const [pdfModalVisible, setPdfModalVisible] = useState(false);
     const [nome, setNome] = useState(paciente.paciente_nome);
     const [email, setEmail] = useState(paciente.paciente_email);
     const [cpf, setCpf] = useState(paciente.paciente_cpf);
@@ -15,9 +15,8 @@ const PacienteDetails = ({ route, navigation }) => {
     const [sus, setSus] = useState(paciente.paciente_sus);
     const [senha, setSenha] = useState(paciente.paciente_senha);
     const [genero, setGenero] = useState(paciente.paciente_genero);
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [pdfLink, setPdfLink] = useState(paciente?.paciente_pdf || '');
 
-    // Atualiza os campos do paciente na tela quando o paciente é modificado
     useEffect(() => {
         setNome(paciente.paciente_nome);
         setEmail(paciente.paciente_email);
@@ -30,26 +29,42 @@ const PacienteDetails = ({ route, navigation }) => {
         setGenero(paciente.paciente_genero);
     }, [paciente]);
 
-    const handleEnviarPDF = async () => {
-        try {
-            let result = await DocumentPicker.getDocumentAsync({
-                type: "application/pdf",
-                copyToCacheDirectory: true,
-            });
-    
-            console.log(result);  // Verificar o resultado do seletor de PDF
-    
-            if (!result.canceled) {  // Corrigido: Verificar se o cancelamento é "false"
-                setSelectedFile(result.uri);  // Atualizar o estado com o URI do arquivo
-                Alert.alert('PDF Selecionado', `Arquivo: ${result.assets[0].name}`);  // Exibir o nome do arquivo selecionado
-            } else {
-                Alert.alert('Seleção Cancelada', 'Você não selecionou nenhum arquivo.');
-            }
-        } catch (error) {
-            console.error('Erro ao selecionar PDF:', error);
-            Alert.alert('Erro', 'Não foi possível selecionar o PDF.');
-        }
+    const handleEnviarPDF = () => {
+        setPdfModalVisible(true);
     };
+
+    const handleSalvarPdfLink = () => {
+        if (pdfLink.trim() === '') {
+            Alert.alert('Erro', 'Por favor, insira o link do PDF.');
+            return;
+        }
+    
+        // Configuração do fetch para enviar o link do PDF
+        fetch(`http://172.16.1.105:3001/atualizarPDF`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                paciente_id: paciente.paciente_id, // Enviando ID do paciente para identificar
+                pdfLink: pdfLink,                 // Enviando o link do PDF
+            }),
+        })
+        .then(response => {
+            console.log('Resposta do servidor:', response);
+            return response.json();
+        })
+        .then(data => {
+            Alert.alert('Sucesso', 'Link do PDF atualizado com sucesso!');
+            setPdfModalVisible(false); // Fecha o modal após salvar o link
+        })
+        .catch(error => {
+            console.error('Erro ao atualizar link do PDF:', error);
+            Alert.alert('Erro', 'Não foi possível atualizar o link do PDF.');
+        });
+    };
+    
+    
 
     const handleEditarPaciente = () => {
         setModalVisible(true);
@@ -61,19 +76,14 @@ const PacienteDetails = ({ route, navigation }) => {
     };
 
     const editarPaciente = (id, dados) => {
-        console.log('Dados enviados:', dados);  // Log dos dados enviados
-    
-        fetch(`http://172.16.1.107:3001/pacientes/${id}`, {
+        fetch(`http://172.16.1.105:3001/pacientes/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(dados),
         })
-        .then(response => {
-            console.log('Resposta do servidor:', response);  // Log da resposta do servidor
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             Alert.alert('Sucesso', 'Paciente atualizado com sucesso!');
         })
@@ -97,9 +107,9 @@ const PacienteDetails = ({ route, navigation }) => {
             ]
         );
     };
-    
+
     const apagarPaciente = (id) => {
-        fetch(`http://172.16.1.107:3001/pacientes/${id}`, {
+        fetch(`http://172.16.1.104:3001/pacientes/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -129,8 +139,6 @@ const PacienteDetails = ({ route, navigation }) => {
                 <Text style={styles.buttonText}>Enviar PDF</Text>
             </TouchableOpacity>
 
-            {selectedFile && <Text>PDF Selecionado: {selectedFile}</Text>}
-
             <TouchableOpacity style={styles.button} onPress={handleEditarPaciente}>
                 <Icon name="edit" size={20} color="#1E90FF" style={styles.icon} />
                 <Text style={styles.buttonText}>Editar Paciente</Text>
@@ -151,83 +159,48 @@ const PacienteDetails = ({ route, navigation }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Editar Paciente</Text>
-
                         <Text>Nome</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Nome"
-                            value={nome}
-                            onChangeText={setNome}
-                        />
-
+                        <TextInput style={styles.input} placeholder="Nome" value={nome} onChangeText={setNome} />
                         <Text>Email</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email"
-                            value={email}
-                            onChangeText={setEmail}
-                        />
-
+                        <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} />
                         <Text>CPF</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="CPF"
-                            value={cpf}
-                            onChangeText={setCpf}
-                        />
-
+                        <TextInput style={styles.input} placeholder="CPF" value={cpf} onChangeText={setCpf} />
                         <Text>Idade</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Idade"
-                            value={idade}
-                            onChangeText={setIdade}
-                        />
-
+                        <TextInput style={styles.input} placeholder="Idade" value={idade} onChangeText={setIdade} />
                         <Text>Celular</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Celular"
-                            value={celular}
-                            onChangeText={setCelular}
-                        />
-
+                        <TextInput style={styles.input} placeholder="Celular" value={celular} onChangeText={setCelular} />
                         <Text>CEP</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="CEP"
-                            value={cep}
-                            onChangeText={setCep}
-                        />
-
-                        <Text>Carteira SUS</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="SUS"
-                            value={sus}
-                            onChangeText={setSus}
-                        />
-                        
+                        <TextInput style={styles.input} placeholder="CEP" value={cep} onChangeText={setCep} />
+                        <Text> Carteira SUS</Text>
+                        <TextInput style={styles.input} placeholder="SUS" value={sus} onChangeText={setSus} />
                         <Text>Senha</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Senha"
-                            value={senha}
-                            onChangeText={setSenha}
-                        />
-
-                        <Text>Genero</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Gênero"
-                            value={genero}
-                            onChangeText={setGenero}
-                        />
-
+                        <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} />
+                        <Text>Gênero</Text>
+                        <TextInput style={styles.input} placeholder="Gênero" value={genero} onChangeText={setGenero} />
                         <Button title="Salvar" onPress={handleSalvarEdicao} />
-                            <Text> </Text>
                         <Button title="Cancelar" onPress={() => setModalVisible(false)} color="red" />
-                        
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Modal para inserir link PDF */}
+            <Modal
+                visible={pdfModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setPdfModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Inserir Link do PDF</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Link do PDF"
+                            value={pdfLink}
+                            onChangeText={setPdfLink}
+                        />
+                        <Button title="Salvar Link" onPress={handleSalvarPdfLink} />
+                        <Button title="Cancelar" onPress={() => setPdfModalVisible(false)} color="red" />
                     </View>
                 </View>
             </Modal>
@@ -236,70 +209,21 @@ const PacienteDetails = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    label: {
-        fontSize: 16,
-        marginBottom: 10,
-    },
+    container: { flex: 1, padding: 20 },
+    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+    label: { fontSize: 16, marginBottom: 10 },
     button: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 15,
-        marginVertical: 10,
-        borderRadius: 10,
-        elevation: 3,
+        flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 15, marginVertical: 10,
+        borderRadius: 10, elevation: 3,
     },
-    buttonText: {
-        fontSize: 16,
-        color: '#1E90FF',
-        marginLeft: 10,
-    },
-    buttonTextDelete: {
-        fontSize: 16,
-        color: '#fff',
-        marginLeft: 10,
-    },
-    deleteButton: {
-        backgroundColor: 'red',
-    },
-    icon: {
-        marginRight: 10,
-    },
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        width: '80%',
-        elevation: 5,
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 15,
-        paddingLeft: 8,
-        borderRadius: 5,
-    },
+    buttonText: { fontSize: 16, color: '#1E90FF', marginLeft: 10 },
+    buttonTextDelete: { fontSize: 16, color: '#fff', marginLeft: 10 },
+    deleteButton: { backgroundColor: 'red' },
+    icon: { marginRight: 10 },
+    modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
+    modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%', elevation: 5 },
+    modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
+    input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 15, paddingLeft: 8, borderRadius: 5 },
 });
 
 export default PacienteDetails;
