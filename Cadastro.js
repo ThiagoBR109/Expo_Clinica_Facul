@@ -36,7 +36,7 @@ const Cadastro = () => {
         };
 
         // Fazendo a requisição POST para a API
-        fetch('http://172.16.1.105:3001/pacientes', {
+        fetch('http://172.16.1.104:3001/pacientes', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

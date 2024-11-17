@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
     const [usuario, setUsuario] = useState('');
@@ -7,20 +8,47 @@ const Login = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
 
-    const handleLogin = () => {
-        if (usuario === 'Thiago' && senha === '123') {
-            setModalMessage('Login Efetuado!');
+    const handleLogin = async () => {
+        try {
+            const response = await fetch('http://172.16.1.104:3001/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cpf: usuario, senha: senha }),
+            });
+
+            // Verifica se o servidor respondeu com status 200 antes de tentar parsear o JSON
+            if (!response.ok) {
+                throw new Error(`Erro: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.message === 'Login bem-sucedido') {
+                setModalMessage('Login Efetuado!');
+                setModalVisible(true);
+                await AsyncStorage.setItem('usuarioLogado', JSON.stringify(data.paciente));
+                const storedUser = await AsyncStorage.getItem('usuarioLogado');
+                console.log('Usuário armazenado:', storedUser);
+                setTimeout(() => {
+                    setModalVisible(false);
+                    navigation.navigate('Exame');
+                    setUsuario('');
+                    setSenha('');
+                }, 1000);
+            } else {
+                setModalMessage(data.message || 'Usuário ou senha inválidos!');
+                setModalVisible(true);
+                setTimeout(() => setModalVisible(false), 2000);
+            }
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
+
+            // Exibe uma mensagem amigável no modal
+            setModalMessage('Erro ao conectar ao servidor. Verifique sua conexão.');
             setModalVisible(true);
-            setTimeout(() => {
-                setModalVisible(false);
-                navigation.navigate('Exame'); 
-                setUsuario('');
-                setSenha('');
-            }, 1000); // Fecha o modal e navega após 2 segundos
-        } else {
-            setModalMessage('Usuário ou senha inválidos!');
-            setModalVisible(true);
-            setTimeout(() => setModalVisible(false), 2000); // Fecha o modal após 2 segundos
+            setTimeout(() => setModalVisible(false), 2000);
         }
     };
 
@@ -34,17 +62,18 @@ const Login = ({ navigation }) => {
                 />
                 <Text style={styles.header}>Saúde Fácil</Text>
             </View>
-        
+
             <Text style={styles.subtitle}>Resultado de Exames</Text>
-        
+
             <View style={styles.inputContainer}>
                 <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Usuário</Text>
+                    <Text style={styles.label}>CPF</Text>
                     <TextInput
                         style={styles.input}
                         value={usuario}
                         onChangeText={setUsuario}
-                        placeholder="Digite seu usuário"
+                        placeholder="Digite seu CPF"
+                        keyboardType="numeric"
                     />
                 </View>
                 <View style={styles.inputGroup}>
@@ -58,7 +87,7 @@ const Login = ({ navigation }) => {
                     />
                 </View>
             </View>
-        
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                     <Text style={styles.buttonText}>LOGIN</Text>
@@ -77,7 +106,6 @@ const Login = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
-
         </View>
     );
 };
@@ -176,8 +204,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 });
-
-
-
 
 export default Login;

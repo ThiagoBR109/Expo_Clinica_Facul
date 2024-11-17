@@ -10,7 +10,7 @@ const app = express();
 // Configurando middlewares
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // Middleware adicionado para permitir requisições URL-encoded
+app.use(bodyParser.urlencoded({ extended: true })); // Middleware para permitir requisições URL-encoded
 
 // Configurando a conexão com o banco de dados MySQL
 const db = mysql.createConnection({
@@ -29,16 +29,37 @@ db.connect((err) => {
     console.log('Conectado ao banco de dados MySQL!');
 });
 
+// Rota para login
+app.post('/login', (req, res) => {
+    const { cpf, senha } = req.body;
+
+    if (!cpf || !senha) {
+        return res.status(400).json({ message: 'CPF e senha são obrigatórios.' });
+    }
+
+    const query = 'SELECT * FROM pacientes WHERE paciente_cpf = ? AND paciente_senha = ?';
+    db.query(query, [cpf, senha], (err, results) => {
+        if (err) {
+            console.error('Erro ao fazer login:', err);
+            return res.status(500).json({ message: 'Erro ao fazer login.' });
+        }
+
+        if (results.length > 0) {
+            res.json({ message: 'Login bem-sucedido', paciente: results[0] });
+        } else {
+            res.status(401).json({ message: 'CPF ou senha incorretos.' });
+        }
+    });
+});
+
 // Rota para adicionar um novo paciente
 app.post('/pacientes', (req, res) => {
     const { nome, email, cpf, idade, celular, cep, sus, senha, genero } = req.body;
 
-    // Verificação básica para garantir que todos os campos estão preenchidos
     if (!nome || !email || !cpf || !idade || !celular || !cep || !sus || !senha || !genero) {
         return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
     }
 
-    // Query para inserir o paciente no banco de dados
     const query = 'INSERT INTO pacientes (paciente_nome, paciente_email, paciente_cpf, paciente_idade, paciente_celular, paciente_cep, paciente_sus, paciente_senha, paciente_genero) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
     db.query(query, [nome, email, cpf, idade, celular, cep, sus, senha, genero], (err, result) => {
         if (err) {
@@ -49,7 +70,7 @@ app.post('/pacientes', (req, res) => {
     });
 });
 
-// Rota para listar todos os pacientes (exemplo de GET)
+// Rota para listar todos os pacientes
 app.get('/pacientes', (req, res) => {
     const query = 'SELECT * FROM pacientes';
     db.query(query, (err, results) => {
@@ -57,16 +78,15 @@ app.get('/pacientes', (req, res) => {
             console.error('Erro ao buscar pacientes:', err);
             return res.status(500).json({ message: 'Erro ao buscar pacientes.' });
         }
-        res.setHeader('Content-Type', 'application/json');  // Garantindo que a resposta seja JSON
         res.json(results);
     });
 });
 
+// Rota para atualizar os dados do paciente
 app.put('/pacientes/:id', (req, res) => {
     const pacienteId = req.params.id;
     const { nome, email, cpf, idade, celular, cep, sus, senha, genero, paciente_pdf } = req.body;
 
-    // Query para atualizar os dados do paciente no banco de dados
     const query = `
         UPDATE pacientes SET 
         paciente_nome = ?, 
@@ -100,7 +120,6 @@ app.put('/pacientes/:id', (req, res) => {
 // Rota para atualizar o link PDF do paciente
 app.post('/atualizarPDF', (req, res) => {
     const { paciente_id, pdfLink } = req.body;
-    console.log("Link recebido:", pdfLink);  // Verificação do valor recebido
 
     const query = 'UPDATE pacientes SET paciente_pdf = ? WHERE paciente_id = ?';
     db.query(query, [pdfLink, paciente_id], (err, result) => {
@@ -109,13 +128,11 @@ app.post('/atualizarPDF', (req, res) => {
             return res.status(500).json({ message: 'Erro ao atualizar PDF.' });
         }
 
-        // Adicione esta linha para garantir que o cabeçalho Content-Type seja JSON
-        res.setHeader('Content-Type', 'application/json');
-
-        res.status(200).json({ message: 'PDF atualizado com sucesso.' });
+        res.json({ message: 'PDF atualizado com sucesso.' });
     });
 });
 
+// Rota para deletar um paciente
 app.delete('/pacientes/:id', (req, res) => {
     const pacienteId = req.params.id;
 

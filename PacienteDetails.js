@@ -40,7 +40,7 @@ const PacienteDetails = ({ route, navigation }) => {
         }
     
         // Configuração do fetch para enviar o link do PDF
-        fetch(`http://172.16.1.105:3001/atualizarPDF`, {
+        fetch(`http://172.16.1.104:3001/atualizarPDF`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -76,7 +76,7 @@ const PacienteDetails = ({ route, navigation }) => {
     };
 
     const editarPaciente = (id, dados) => {
-        fetch(`http://172.16.1.105:3001/pacientes/${id}`, {
+        fetch(`http://172.16.1.104:3001/pacientes/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

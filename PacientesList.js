@@ -7,7 +7,7 @@ const PacientesList = ({ navigation }) => {
 
     // Função para buscar pacientes do servidor
     const fetchPacientes = () => {
-        fetch('http://172.16.1.105:3001/pacientes')
+        fetch('http://172.16.1.104:3001/pacientes')
         .then(response => response.json())
         .then(data => {
             setPacientes(data);  // Define os pacientes no estado
