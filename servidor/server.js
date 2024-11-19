@@ -82,6 +82,24 @@ app.get('/pacientes', (req, res) => {
     });
 });
 
+app.get('/pacientes/:id/pdf', (req, res) => {
+    const pacienteId = req.params.id;
+
+    const query = 'SELECT paciente_pdf FROM pacientes WHERE paciente_id = ?';
+    db.query(query, [pacienteId], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar PDF do paciente:', err);
+            return res.status(500).json({ message: 'Erro ao buscar PDF do paciente.' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Paciente não encontrado ou PDF não disponível.' });
+        }
+
+        res.json({ pdfLink: results[0].paciente_pdf });
+    });
+});
+
 // Rota para atualizar os dados do paciente
 app.put('/pacientes/:id', (req, res) => {
     const pacienteId = req.params.id;

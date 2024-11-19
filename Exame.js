@@ -1,51 +1,84 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
-
-const examList = [
-    { id: '1', name: 'Exame de Sangue', date: '2024-09-20' },
-    { id: '2', name: 'Raio-X de Tórax', date: '2024-09-15' },
-    { id: '3', name: 'Ressonância Magnética', date: '2024-09-10' },
-];
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Exame = () => {
-    const navigation = useNavigation();
+    const [paciente, setPaciente] = useState(null); // Dados do paciente
+    const [loading, setLoading] = useState(true); // Carregamento
 
-const formatDate = (dateString) => {
-    const [year, month, day] = dateString.split('-');
-    return `${day}/${month}/${year}`; 
-};
+    // Função para buscar os dados do paciente
+    const fetchPaciente = async () => {
+        try {
+            // Usar a mesma chave de AsyncStorage definida no Login.js
+            const user = await AsyncStorage.getItem('usuarioLogado'); 
+            const pacienteLogado = JSON.parse(user);
+    
+            if (pacienteLogado && pacienteLogado.paciente_id) {
+                const response = await fetch(`http://172.16.1.107:3001/pacientes/${pacienteLogado.paciente_id}/pdf`);
+                const data = await response.json();
+    
+                console.log('Resposta da API:', data);
+    
+                // Verifica se o PDF está disponível
+                if (data.pdfLink) {
+                    setPaciente({ paciente_pdf: data.pdfLink });
+                } else {
+                    console.warn('Nenhum PDF disponível.');
+                }
+            } else {
+                console.warn('Paciente não encontrado no AsyncStorage.');
+            }
+        } catch (error) {
+            console.error('Erro ao carregar paciente:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
-const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('ExamDetails', { examId: item.id })}>
-        <View style={styles.textContainer}>
-            <Text style={styles.examName}>{item.name}</Text>
-            <Text style={styles.examDate}>Data: {formatDate(item.date)}</Text>
+    // Carrega os dados ao montar o componente
+    useEffect(() => {
+        fetchPaciente();
+    }, []);
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#1E90FF" />
+                <Text>Carregando informações...</Text>
+            </View>
+        );
+    }
+
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Meus Exames</Text>
+            {paciente && paciente.paciente_pdf ? (
+                <TouchableOpacity
+                    style={styles.card}
+                    onPress={() => Linking.openURL(paciente.paciente_pdf)} // Abre o PDF no navegador
+                >
+                    <Text style={styles.examName}>Visualizar Exame</Text>
+                </TouchableOpacity>
+            ) : (
+                <Text style={styles.noExamsText}>Nenhum exame disponível.</Text>
+            )}
         </View>
-        <Icon name="chevron-right" size={24} color="#1E90FF" />
-    </TouchableOpacity>
-);
-
-return (
-    <View style={styles.container}> 
-        <Text style={styles.title}>Meus Exames</Text>
-        <FlatList
-            data={examList}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-        />
-    </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20 },
     title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    card: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' ,padding: 15, backgroundColor: '#f8f8f8', marginBottom: 10, borderRadius: 8 },
-    textContainer:{flexDirection: 'column'},
-    examName: { fontSize: 18 },
-    examDate: { color: '#888' },
+    card: {
+        padding: 15,
+        backgroundColor: '#f8f8f8',
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    examName: { fontSize: 18, color: '#1E90FF' },
+    noExamsText: { textAlign: 'center', color: '#888', fontSize: 16 },
+    loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
 
 export default Exame;
