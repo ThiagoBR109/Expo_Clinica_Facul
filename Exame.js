@@ -3,23 +3,20 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Linking } 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Exame = () => {
-    const [paciente, setPaciente] = useState(null); // Dados do paciente
-    const [loading, setLoading] = useState(true); // Carregamento
+    const [paciente, setPaciente] = useState(null); 
+    const [loading, setLoading] = useState(true); 
 
-    // Função para buscar os dados do paciente
     const fetchPaciente = async () => {
         try {
-            // Usar a mesma chave de AsyncStorage definida no Login.js
             const user = await AsyncStorage.getItem('usuarioLogado'); 
             const pacienteLogado = JSON.parse(user);
     
             if (pacienteLogado && pacienteLogado.paciente_id) {
-                const response = await fetch(`http://172.16.1.107:3001/pacientes/${pacienteLogado.paciente_id}/pdf`);
+                const response = await fetch(`http://172.16.1.111:3001/pacientes/${pacienteLogado.paciente_id}/pdf`);
                 const data = await response.json();
     
                 console.log('Resposta da API:', data);
     
-                // Verifica se o PDF está disponível
                 if (data.pdfLink) {
                     setPaciente({ paciente_pdf: data.pdfLink });
                 } else {
@@ -36,7 +33,6 @@ const Exame = () => {
     };
     
 
-    // Carrega os dados ao montar o componente
     useEffect(() => {
         fetchPaciente();
     }, []);
@@ -56,13 +52,16 @@ const Exame = () => {
             {paciente && paciente.paciente_pdf ? (
                 <TouchableOpacity
                     style={styles.card}
-                    onPress={() => Linking.openURL(paciente.paciente_pdf)} // Abre o PDF no navegador
+                    onPress={() => Linking.openURL(paciente.paciente_pdf)} 
                 >
                     <Text style={styles.examName}>Visualizar Exame</Text>
                 </TouchableOpacity>
             ) : (
                 <Text style={styles.noExamsText}>Nenhum exame disponível.</Text>
             )}
+            <Text style={styles.footerText}>
+                O resultado dos exames podem ficar prontos entre 1 a 5 dias úteis após realizado.
+            </Text>
         </View>
     );
 };
@@ -79,6 +78,16 @@ const styles = StyleSheet.create({
     examName: { fontSize: 18, color: '#1E90FF' },
     noExamsText: { textAlign: 'center', color: '#888', fontSize: 16 },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    footerText: {
+        textAlign: 'center',
+        color: 'red', 
+        fontSize: 14,
+        marginTop: 20,
+        position: 'absolute',
+        bottom: 30,
+        right: 0,
+        left: 0,
+    },
 });
 
 export default Exame;

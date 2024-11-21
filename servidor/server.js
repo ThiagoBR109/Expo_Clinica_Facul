@@ -1,26 +1,21 @@
-// Importando as dependências necessárias
 const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-// Criando uma instância do Express
 const app = express();
 
-// Configurando middlewares
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // Middleware para permitir requisições URL-encoded
+app.use(bodyParser.urlencoded({ extended: true })); 
 
-// Configurando a conexão com o banco de dados MySQL
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',  // Sua senha do MySQL, se tiver
-    database: 'clinica_db'  // Nome do banco de dados
+    password: '',  
+    database: 'clinica_db'  
 });
 
-// Conectando ao banco de dados
 db.connect((err) => {
     if (err) {
         console.error('Erro ao conectar ao banco de dados:', err);
@@ -29,7 +24,6 @@ db.connect((err) => {
     console.log('Conectado ao banco de dados MySQL!');
 });
 
-// Rota para login
 app.post('/login', (req, res) => {
     const { cpf, senha } = req.body;
 
@@ -52,7 +46,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-// Rota para adicionar um novo paciente
 app.post('/pacientes', (req, res) => {
     const { nome, email, cpf, idade, celular, cep, sus, senha, genero } = req.body;
 
@@ -70,7 +63,6 @@ app.post('/pacientes', (req, res) => {
     });
 });
 
-// Rota para listar todos os pacientes
 app.get('/pacientes', (req, res) => {
     const query = 'SELECT * FROM pacientes';
     db.query(query, (err, results) => {
@@ -100,7 +92,6 @@ app.get('/pacientes/:id/pdf', (req, res) => {
     });
 });
 
-// Rota para atualizar os dados do paciente
 app.put('/pacientes/:id', (req, res) => {
     const pacienteId = req.params.id;
     const { nome, email, cpf, idade, celular, cep, sus, senha, genero, paciente_pdf } = req.body;
@@ -135,7 +126,6 @@ app.put('/pacientes/:id', (req, res) => {
     });
 });
 
-// Rota para atualizar o link PDF do paciente
 app.post('/atualizarPDF', (req, res) => {
     const { paciente_id, pdfLink } = req.body;
 
@@ -150,7 +140,6 @@ app.post('/atualizarPDF', (req, res) => {
     });
 });
 
-// Rota para deletar um paciente
 app.delete('/pacientes/:id', (req, res) => {
     const pacienteId = req.params.id;
 
@@ -169,19 +158,17 @@ app.delete('/pacientes/:id', (req, res) => {
     });
 });
 
-// Função para reconectar ao MySQL em caso de perda de conexão
 function handleDisconnect() {
     db.connect((err) => {
         if (err) {
             console.error('Erro ao reconectar ao banco de dados:', err);
-            setTimeout(handleDisconnect, 2000); // Tentar reconectar após 2 segundos
+            setTimeout(handleDisconnect, 2000); 
         } else {
             console.log('Reconectado ao banco de dados MySQL.');
         }
     });
 }
 
-// Detectando desconexão do MySQL e tentando reconectar
 db.on('error', (err) => {
     console.error('Erro no banco de dados:', err);
     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
@@ -191,7 +178,6 @@ db.on('error', (err) => {
     }
 });
 
-// Iniciando o servidor
 const PORT = 3001;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Servidor rodando na porta ${PORT} e acessível pela rede local`);

@@ -16,11 +16,11 @@ const Login_adm = ({ navigation }) => {
                 navigation.navigate('Menu_adm'); 
                 setUsuario('');
                 setSenha('');
-            }, 1000); // Fecha o modal e navega após 2 segundos
+            }, 1000); 
         } else {
             setModalMessage('Usuário ou senha inválidos!');
             setModalVisible(true);
-            setTimeout(() => setModalVisible(false), 2000); // Fecha o modal após 2 segundos
+            setTimeout(() => setModalVisible(false), 2000); 
         }
     };
 

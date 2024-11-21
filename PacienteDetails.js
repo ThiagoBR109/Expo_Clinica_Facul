@@ -39,15 +39,15 @@ const PacienteDetails = ({ route, navigation }) => {
             return;
         }
     
-        // Configuração do fetch para enviar o link do PDF
-        fetch(`http://172.16.1.107:3001/atualizarPDF`, {
+        
+        fetch(`http://172.16.1.111:3001/atualizarPDF`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                paciente_id: paciente.paciente_id, // Enviando ID do paciente para identificar
-                pdfLink: pdfLink,                 // Enviando o link do PDF
+                paciente_id: paciente.paciente_id, 
+                pdfLink: pdfLink,                 
             }),
         })
         .then(response => {
@@ -56,7 +56,7 @@ const PacienteDetails = ({ route, navigation }) => {
         })
         .then(data => {
             Alert.alert('Sucesso', 'Link do PDF atualizado com sucesso!');
-            setPdfModalVisible(false); // Fecha o modal após salvar o link
+            setPdfModalVisible(false); 
         })
         .catch(error => {
             console.error('Erro ao atualizar link do PDF:', error);
@@ -76,7 +76,7 @@ const PacienteDetails = ({ route, navigation }) => {
     };
 
     const editarPaciente = (id, dados) => {
-        fetch(`http://172.16.1.107:3001/pacientes/${id}`, {
+        fetch(`http://172.16.1.111:3001/pacientes/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const PacienteDetails = ({ route, navigation }) => {
     };
 
     const apagarPaciente = (id) => {
-        fetch(`http://172.16.1.107:3001/pacientes/${id}`, {
+        fetch(`http://172.16.1.111:3001/pacientes/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -149,7 +149,6 @@ const PacienteDetails = ({ route, navigation }) => {
                 <Text style={styles.buttonTextDelete}>Apagar Paciente</Text>
             </TouchableOpacity>
 
-            {/* Modal para edição */}
             <Modal
                 visible={modalVisible}
                 animationType="slide"
@@ -183,7 +182,6 @@ const PacienteDetails = ({ route, navigation }) => {
                 </View>
             </Modal>
 
-            {/* Modal para inserir link PDF */}
             <Modal
                 visible={pdfModalVisible}
                 animationType="slide"

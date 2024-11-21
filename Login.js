@@ -10,7 +10,7 @@ const Login = ({ navigation }) => {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('http://172.16.1.107:3001/login', {
+            const response = await fetch('http://172.16.1.111:3001/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ const Login = ({ navigation }) => {
                 body: JSON.stringify({ cpf: usuario, senha: senha }),
             });
 
-            // Verifica se o servidor respondeu com status 200 antes de tentar parsear o JSON
+            
             if (!response.ok) {
                 throw new Error(`Erro: ${response.status}`);
             }
@@ -45,7 +45,7 @@ const Login = ({ navigation }) => {
         } catch (error) {
             console.error('Erro ao fazer login:', error);
 
-            // Exibe uma mensagem amigável no modal
+            
             setModalMessage('Erro ao conectar ao servidor. Verifique sua conexão.');
             setModalVisible(true);
             setTimeout(() => setModalVisible(false), 2000);
@@ -74,6 +74,7 @@ const Login = ({ navigation }) => {
                         onChangeText={setUsuario}
                         placeholder="Digite seu CPF"
                         keyboardType="numeric"
+                        maxLength={11}
                     />
                 </View>
                 <View style={styles.inputGroup}>

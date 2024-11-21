@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';  // Importando o ícone
+import Icon from 'react-native-vector-icons/FontAwesome';  
 
 const PacientesList = ({ navigation }) => {
     const [pacientes, setPacientes] = useState([]);
 
-    // Função para buscar pacientes do servidor
+    
     const fetchPacientes = () => {
-        fetch('http://172.16.1.107:3001/pacientes')
+        fetch('http://172.16.1.111:3001/pacientes')
         .then(response => response.json())
         .then(data => {
-            setPacientes(data);  // Define os pacientes no estado
+            setPacientes(data);  
         })
         .catch(error => {
             console.error('Erro ao buscar pacientes:', error);
@@ -20,10 +20,10 @@ const PacientesList = ({ navigation }) => {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            fetchPacientes();  // Busca os pacientes quando a tela voltar a ser focada
+            fetchPacientes();  
         });
 
-        return unsubscribe;  // Remove o listener quando o componente desmontar
+        return unsubscribe;  
     }, [navigation]);
 
     const renderPaciente = ({ item }) => (
@@ -37,7 +37,6 @@ const PacientesList = ({ navigation }) => {
                     <Text style={styles.pacienteEmail}>{item.paciente_email}</Text>
                     <Text style={styles.pacienteCpf}>CPF: {item.paciente_cpf}</Text>
                 </View>
-                {/* Adicionando o ícone de chevron-right */}
                 <Icon name="chevron-right" size={20} color="#f56f42" />
             </View>
         </TouchableOpacity>
@@ -74,13 +73,13 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         elevation: 3,
         flexDirection: 'row',
-        justifyContent: 'space-between', // Para alinhar o ícone à direita
-        alignItems: 'center',            // Alinhar o texto e ícone verticalmente
+        justifyContent: 'space-between', 
+        alignItems: 'center',            
     },
     pacienteInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        flex: 1, // Faz com que o conteúdo do paciente ocupe o espaço restante
+        flex: 1, 
     },
     pacienteNome: {
         fontSize: 18,

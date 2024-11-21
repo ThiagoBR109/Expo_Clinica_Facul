@@ -14,15 +14,12 @@ const Cadastro = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
 
-    // Função para enviar os dados para o backend
     const handleCadastro = () => {
-        // Validação básica dos campos antes de enviar
         if (!nome || !email || !cpf || !idade || !celular || !cep || !sus || !senha || !genero) {
             showModal('Erro: Todos os campos devem ser preenchidos.');
             return;
         }
 
-        // Dados a serem enviados para o backend
         const pacienteData = {
             nome,
             email,
@@ -35,8 +32,7 @@ const Cadastro = () => {
             genero
         };
 
-        // Fazendo a requisição POST para a API
-        fetch('http://172.16.1.107:3001/pacientes', {
+        fetch('http://172.16.1.111:3001/pacientes', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,7 +43,6 @@ const Cadastro = () => {
         .then(data => {
             if (data.message === 'Paciente cadastrado com sucesso!') {
                 showModal('Paciente cadastrado com sucesso!');
-                // Limpar os campos após o cadastro
                 setNome('');
                 setEmail('');
                 setCpf('');
@@ -71,7 +66,7 @@ const Cadastro = () => {
         setModalMessage(message);
         setModalVisible(true);
         setTimeout(() => {
-            setModalVisible(false);  // Fecha o modal automaticamente após 2 segundos
+            setModalVisible(false); 
         }, 2000);
     };
 
@@ -172,7 +167,6 @@ const Cadastro = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Modal de notificação */}
             <Modal
                 transparent={true}
                 animationType="fade"
